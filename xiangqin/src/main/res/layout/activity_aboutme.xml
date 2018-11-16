@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.AppCompatTextView
+        android:textSize="17sp"
+        android:textColor="@color/colorAccent"
+        android:text="自由相亲社区是用来给单身男女自由交友的一个社区，社区的单身男女发布自己的相亲信息，社区进行展示，中意的可以自由联系，希望社区能帮到你!忘记登录密码可以咨询博主[13480901446(微信同号)]"
+        android:layout_margin="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/showPC"
+        android:layout_margin="16dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textIsSelectable="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/copy"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="复制网址"
+        android:textStyle="bold" />
+</LinearLayout>

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">我是大佬</string>
+    <string name="contactMe">联系我</string>
+    <string name="aboutApp">
+        本软件开发主要用来给各位猎头发布IT方面的职位信息的
+        和给各位IT大佬寻找合适职位的一个小小平台
+        平台无法审核职位情况，各位求职请小心甄选!
+        也请发布职位的不要乱发，互利共赢！\n
+        微信：134-8090-1446
+    </string>
+    <string name="exit_app">再按一次退出软件!</string>
+</resources>

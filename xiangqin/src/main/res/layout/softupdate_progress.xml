@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.daimajia.numberprogressbar.NumberProgressBar
+        android:id="@+id/update_progress"
+        android:layout_marginTop="5dp"
+        style="@style/NumberProgressBar_Warning_Red"/>
+</LinearLayout>

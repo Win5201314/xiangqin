@@ -1,0 +1,40 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.zsl.itgod.MainActivity">
+    <item
+        android:id="@+id/action_likeMe"
+        android:orderInCategory="100"
+        android:title="钟意我的"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_likeOther"
+        android:orderInCategory="100"
+        android:title="我钟意的"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_joinGroup"
+        android:orderInCategory="100"
+        android:title="进社区群"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_send"
+        android:orderInCategory="100"
+        android:title="@string/send"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_share"
+        android:orderInCategory="100"
+        android:title="分享本社区"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_me"
+        android:orderInCategory="100"
+        android:title="关于本社区"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_exit"
+        android:orderInCategory="100"
+        android:title="退出本账号"
+        app:showAsAction="never" />
+</menu>
