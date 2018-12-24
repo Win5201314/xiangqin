@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_margin="16dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.AppCompatTextView
+            android:textColor="#000000"
+            android:id="@+id/message"
+            android:text="个人信息"
+            android:textIsSelectable="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <android.support.v7.widget.AppCompatTextView
+            android:visibility="gone"
+            android:textColor="@color/colorAccent"
+            android:text="如果你想跟(他或者她)聊,请将你的个人信息加图片,通过上面邮件地址发过去!"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/image1"
+            android:layout_marginTop="8dp"
+            android:src="@mipmap/dsg"
+            android:scaleType="centerCrop"
+            android:layout_width="wrap_content"
+            android:layout_height="300dp" />
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/image2"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="8dp"
+            android:src="@mipmap/dsg"
+            android:layout_width="wrap_content"
+            android:layout_height="300dp" />
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/image3"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="8dp"
+            android:src="@mipmap/dsg"
+            android:layout_width="wrap_content"
+            android:layout_height="300dp" />
+
+        <Button
+            android:id="@+id/delete"
+            android:background="@color/colorAccent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="删除自己发布的"
+            android:textStyle="bold" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="180dp"/>
+    </LinearLayout>
+</ScrollView>

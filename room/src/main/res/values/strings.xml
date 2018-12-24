@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">深圳租房</string>
+    <string name="title_home">合租</string>
+    <string name="title_dashboard">转租</string>
+    <string name="title_notifications">求租</string>
+    <string name="exit_app">再按一次退出软件!</string>
+    <string name="group">联系管理员</string>
+    <string name="send">发布</string>
+</resources>

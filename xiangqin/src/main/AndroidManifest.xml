@@ -12,8 +12,12 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <!--保持CPU 运转，屏幕和键盘灯有可能是关闭的,用于文件上传和下载 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name = "com.zsl.MyApplication"
@@ -43,7 +47,12 @@
         <activity android:name="com.zsl.activity.LikeActivity" android:label="钟意我的" android:theme="@style/newMDTheme"/>
         <activity android:name="com.zsl.activity.LikeOtherActivity" android:label="我钟意的" android:theme="@style/newMDTheme"/>
         <activity android:name="com.zsl.activity.JoinGroupActivity" android:label="进社区群" android:theme="@style/newMDTheme"/>
-
+        <activity android:name="com.zsl.activity.NewsActivity" android:label="每日资讯" android:theme="@style/newMDTheme"/>
+        <activity android:name="com.zsl.activity.MeSendActivity" android:label="我的发布" android:theme="@style/newMDTheme"/>
+        <activity android:name="com.zsl.activity.SendNewsActivity" android:label="发布新闻" android:theme="@style/newMDTheme"/>
+        <activity android:name="com.zsl.activity.ShowNewsActivity" android:theme="@style/newMDTheme"/>
+        <activity android:name="com.zsl.activity.CheckActivity" android:label="审核投稿" android:theme="@style/newMDTheme"/>
+        <activity android:name="com.zsl.activity.BeforeDetailActivity" android:label="审核详细" android:theme="@style/newMDTheme"/>
 
         <activity
             android:name="com.tencent.bugly.beta.ui.BetaActivity"

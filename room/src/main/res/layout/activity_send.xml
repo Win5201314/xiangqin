@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_vertical_margin">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/sq"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="商圈"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <RadioGroup
+                android:id="@+id/type"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <RadioButton
+                    android:id="@+id/hz"
+                    android:text="合租"
+                    android:checked="true"
+                    android:textColor="#0000FF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <RadioButton
+                    android:id="@+id/zz"
+                    android:text="转租"
+                    android:textColor="@color/colorAccent"
+                    android:layout_marginStart="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RadioGroup>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="房源地址[可详述]"
+                    />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/xq"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="是否小区房[可详述]"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/dt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="是否有电梯[可详述]"
+                    />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/money"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="房源价格[可详述]"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/qk"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="房源情况[可详述]"/>
+
+            </android.support.design.widget.TextInputLayout>
+            <Button
+                android:id="@+id/image"
+                android:background="@color/colorAccent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="选择房源图片"
+                android:textStyle="bold" />
+            <Button
+                android:id="@+id/send"
+                android:background="@color/colorAccent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="发   布"
+                android:textStyle="bold" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="180dp"/>
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>

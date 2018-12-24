@@ -65,6 +65,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="家乡"
+                    android:focusable="false"
+                    android:editable="false"
                     android:maxLines="1"
                     android:singleLine="true" />
 
@@ -79,6 +81,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="出生年月"
+                    android:focusable="false"
+                    android:editable="false"
                     android:maxLines="1"
                     android:singleLine="true" />
 
@@ -93,6 +97,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="现居地"
+                    android:focusable="false"
+                    android:editable="false"
                     android:maxLines="1"
                     android:singleLine="true" />
 
@@ -106,7 +112,8 @@
                     android:id="@+id/sg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="身高"
+                    android:hint="身高[cm]"
+                    android:inputType="number"
                     android:maxLines="1"
                     android:singleLine="true" />
 
@@ -120,13 +127,15 @@
                     android:id="@+id/tz"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="体重"
+                    android:hint="体重[kg]"
                     android:maxLines="1"
+                    android:inputType="number"
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -148,6 +157,8 @@
                     android:id="@+id/xl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:editable="false"
+                    android:focusable="false"
                     android:hint="学历"/>
 
             </android.support.design.widget.TextInputLayout>
@@ -186,13 +197,16 @@
 
                 <EditText
                     android:id="@+id/carAndHome"
+                    android:gravity="start"
+                    android:background="@drawable/shape_ed"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="200dp"
                     android:hint="车房情况(最好详细点)"/>
 
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -205,6 +219,7 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -222,13 +237,16 @@
 
                 <EditText
                     android:id="@+id/yq"
+                    android:gravity="start"
+                    android:background="@drawable/shape_ed"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="300dp"
                     android:hint="对另一半的要求"/>
 
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -289,6 +307,21 @@
                 android:layout_height="wrap_content">
 
                 <EditText
+                    android:id="@+id/bc"
+                    android:gravity="start"
+                    android:background="@drawable/shape_ed"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:hint="需要额外补充的在这里写"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
                     android:id="@+id/email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -304,7 +337,7 @@
                 android:layout_marginTop="5dp"
                 style="@style/NumberProgressBar_Warning_Red"/>
             <android.support.v7.widget.AppCompatTextView
-                android:text="点击下面每一只公仔狗进行添加您的美照\n公仔狗愿你早日脱单"
+                android:text="点击下面任意一只公仔狗进行添加3张您的美照\n公仔狗愿你早日脱单"
                 android:layout_marginTop="16dp"
                 android:textColor="@color/colorAccent"
                 android:layout_width="match_parent"
@@ -333,7 +366,7 @@
                 android:layout_height="300dp" />
 
             <android.support.v7.widget.AppCompatTextView
-                android:text="上传完之后,我们审核通过之后会展示在主页!"
+                android:text="上传完之后,我们审核通过之后会展示在主页!\n通过后可在我的发布里面看到"
                 android:layout_marginTop="16dp"
                 android:textColor="@color/colorAccent"
                 android:layout_width="match_parent"

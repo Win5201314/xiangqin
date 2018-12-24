@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.view.View;
 
 import com.zsl.bean.UserBean;
 
@@ -19,6 +20,25 @@ public class UtilTools {
         List<UserBean> userBeans = LitePal.findAll(UserBean.class);
         return (userBeans != null && userBeans.size() == 1);
     }
+
+    public static boolean isBoss() {
+        List<UserBean> userBeans = LitePal.findAll(UserBean.class);
+        if (userBeans != null && userBeans.size() == 1) {
+            UserBean userBean = userBeans.get(0);
+            return userBean.getPhoneNumber().equals("13480901446");
+        }
+        return false;
+    }
+
+    public static String loginedPhone() {
+        List<UserBean> userBeans = LitePal.findAll(UserBean.class);
+        if (userBeans != null && userBeans.size() == 1) {
+            UserBean userBean = userBeans.get(0);
+            return userBean.getPhoneNumber();
+        }
+        return "";
+    }
+
 
     /**
      * 　　* 获取版本号

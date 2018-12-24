@@ -1,1 +1,1 @@
-include ':app', ':xiangqin'
+include ':app', ':xiangqin', ':firstXposed', ':room'

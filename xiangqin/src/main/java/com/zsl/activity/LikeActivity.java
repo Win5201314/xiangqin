@@ -9,21 +9,24 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
-import android.view.View;
 
+import com.zsl.Util.UtilTools;
 import com.zsl.adapter.LikeMeAdapter;
-import com.zsl.adapter.UserImageAdapter;
 import com.zsl.bean.Detail;
-import com.zsl.bean.UserImage;
+import com.zsl.bean.LikeBean;
 import com.zsl.xiangqin.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 
 //钟意我的
 public class LikeActivity extends BaseActivity implements LikeMeAdapter.OnItemClickListener {
@@ -52,20 +55,6 @@ public class LikeActivity extends BaseActivity implements LikeMeAdapter.OnItemCl
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_like);
-
-        for (int i = 0; i < 15; i++) {
-            Detail detail = new Detail();
-            detail.setName("张胜利");
-            detail.setPhone("13480901446");
-            detail.setBirthday("92.2");
-            detail.setPath("湖北咸宁");
-            detail.setResidence("深圳福田");
-            detail.setCar("有房有车");
-            detail.setEducation("本科");
-            detail.setOccupation("IT程序员");
-            detail.setSalary("12K+");
-            details.add(detail);
-        }
 
         mSwipeRefreshWidget = findViewById(R.id.swipe_refresh_widget);
 
@@ -113,32 +102,91 @@ public class LikeActivity extends BaseActivity implements LikeMeAdapter.OnItemCl
             }
 
         });
+
+        onrefresh();
     }
 
     //刷新获取后台数据
     private void onrefresh() {
         mSwipeRefreshWidget.setRefreshing(true);
-        // 此处在现实项目中，请换成网络请求数据代码，sendRequest .....
         new Thread(new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < 8; i++) {
-                    Detail detail = new Detail();
-                    detail.setName("张胜利");
-                    detail.setPhone("13480901446");
-                    detail.setBirthday("92.2");
-                    detail.setPath("湖北咸宁");
-                    detail.setResidence("深圳福田");
-                    details.add(detail);
-                }
-                handler.sendEmptyMessageDelayed(0, 5000);
+                //先将本人信息查出来
+                BmobQuery<LikeBean> query = new BmobQuery<>();
+                //查询playerName叫“比目”的数据
+                query.addWhereEqualTo("phone", UtilTools.loginedPhone());
+                //返回1条数据，如果不加上这条语句，默认返回10条数据
+                query.setLimit(1);
+                //最新数据优先排出
+                query.order("-createdAt");
+                //执行查询方法
+                query.findObjects(new FindListener<LikeBean>() {
+                    @Override
+                    public void done(List<LikeBean> object, BmobException e) {
+                        if (e == null) {
+                            if (object.size() <= 0) {
+                                handler.sendEmptyMessage(0);
+                                //ToastUtil.normalShow(context, "不存在,可能已被移除!", true);
+                                return;
+                            }
+                            LikeBean likeBean = object.get(0);
+                            String likeMe = likeBean.getLikeMe();
+                            String[] lm = likeMe.split(",");
+                            for (String s : lm) { findDetail(s); }
+                            handler.sendEmptyMessage(0);
+                        } else {
+                            Log.d("TAG", "rglijtrogurot");
+                        }
+                    }
+                });
             }
         }).start();
     }
 
+    private void findDetail(String phone) {
+        //先将本人信息查出来
+        BmobQuery<Detail> query = new BmobQuery<>();
+        //查询playerName叫“比目”的数据
+        query.addWhereEqualTo("phone", phone);
+        //返回1条数据，如果不加上这条语句，默认返回10条数据
+        query.setLimit(1);
+        //最新数据优先排出
+        query.order("-createdAt");
+        //执行查询方法
+        query.findObjects(new FindListener<Detail>() {
+            @Override
+            public void done(List<Detail> object, BmobException e) {
+                if (e == null) {
+                    if (object.size() <= 0) { return; }
+                    Detail detail = object.get(0);
+                    if (detail != null && isNeedAdd(detail)) details.add(detail);
+                }
+            }
+        });
+    }
+
+    public boolean isNeedAdd(Detail d) {
+        String phoneNumber = d.getPhone();
+        boolean flag = false;
+        for (Detail detail : details) {
+            flag = phoneNumber.equals(detail.getPhone());
+            if (flag) return false;
+        }
+        return true;
+    }
+
     @Override
     public void onClick(int position) {
-        startActivity(new Intent(this, DetailActivity.class));
+        if (details.size() > position) {
+            Detail detail = details.get(position);
+            if (detail != null) {
+                Intent intent = new Intent(this, DetailActivity.class);
+                intent.putExtra("detail", detail);
+                intent.putExtra("like", "like");
+                startActivity(intent);
+            }
+        }
     }
 
 }

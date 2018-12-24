@@ -8,13 +8,9 @@ import android.view.View;
 import android.widget.Button;
 
 import com.zsl.Util.ToastUtil;
-import com.zsl.bean.UserBean;
+import com.zsl.Util.UtilTools;
 import com.zsl.xiangqin.LoginActivity;
 import com.zsl.xiangqin.R;
-
-import org.litepal.LitePal;
-
-import java.util.List;
 
 public class AgreeActivity extends BaseActivity {
 
@@ -32,18 +28,15 @@ public class AgreeActivity extends BaseActivity {
             public void onClick(View view) {
                 boolean flag = box.isChecked();
                 if (flag) {
-                    /*List<UserBean> userBeans = LitePal.findAll(UserBean.class);
-                    if (userBeans != null && userBeans.size() == 1) {
+                    if (UtilTools.isLogined()) {
                         startActivity(new Intent(AgreeActivity.this, SubmitActivity.class));
                     } else {
-                        ToastUtil.show(this, R.string.needLogin, true);
+                        ToastUtil.show(AgreeActivity.this, R.string.needLogin, true);
                         //没登录，就去登录
                         startActivity(new Intent(AgreeActivity.this, LoginActivity.class));
-                        finish();
-                    }*/
-                    startActivity(new Intent(AgreeActivity.this, SubmitActivity.class));
+                    }
                 } else {
-                    ToastUtil.normalShow(AgreeActivity.this, "同意并发布!", true);
+                    ToastUtil.normalShow(AgreeActivity.this, "请勾选同意并发布!", true);
                 }
             }
         });

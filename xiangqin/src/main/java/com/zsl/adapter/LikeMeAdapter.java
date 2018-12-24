@@ -1,6 +1,7 @@
 package com.zsl.adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.squareup.picasso.Picasso;
 import com.zsl.bean.Detail;
 import com.zsl.xiangqin.R;
 
@@ -23,6 +25,7 @@ public class LikeMeAdapter extends RecyclerView.Adapter<LikeMeAdapter.ViewHolder
         this.context = context;
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.bean_likeme, viewGroup, false);
@@ -30,10 +33,10 @@ public class LikeMeAdapter extends RecyclerView.Adapter<LikeMeAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, final int i) {
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
         Detail detail = details.get(i);
         //下载图片
-        viewHolder.pic.setImageResource(R.mipmap.sc2);
+        Picasso.with(context).load(detail.getImageUrl().split(";")[0]).into(viewHolder.pic);
         StringBuffer sb = new StringBuffer();
         sb.append("名字：" + detail.getName() + "\n")
                 .append("手机号：" + detail.getPhone() + "\n")

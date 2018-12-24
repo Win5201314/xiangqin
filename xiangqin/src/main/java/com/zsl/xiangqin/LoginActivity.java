@@ -18,26 +18,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.zsl.Util.ActivityCollector;
-import com.zsl.Util.Logger;
 import com.zsl.Util.ToastUtil;
-import com.zsl.Util.UrlUtil;
 import com.zsl.activity.AboutMeActivity;
 import com.zsl.activity.MainActivity;
 import com.zsl.activity.RegisterActivity;
 import com.zsl.bean.UserBean;
 
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.LogInListener;
 
 /**
  * A login screen that offers login via email/password.
@@ -58,22 +48,6 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             progressDialog.dismiss();
-            switch (msg.what){
-                case 0:{
-                    ToastUtil.normalShow(LoginActivity.this, "访问服务器失败!", true);
-                    break;
-                }
-                case 1:{
-                    ToastUtil.normalShow(LoginActivity.this, "登录成功!", true);
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    finish();
-                    break;
-                }
-                case 2:{
-                    ToastUtil.normalShow(LoginActivity.this, "本账号不存在!", true);
-                    break;
-                }
-            }
         }
     };
 
@@ -163,57 +137,34 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            login(email, password);
+            loginBom(email, password);
         }
     }
 
-    private void login(final String email, final String password) {
+    private void loginBom(final String email, final String password) {
         progressDialog = new ProgressDialog(LoginActivity.this);
         progressDialog.setTitle(getResources().getString(R.string.app_name));
         progressDialog.setMessage(getResources().getString(R.string.loging));
         progressDialog.setCancelable(true);
         progressDialog.show();
 
-        OkHttpClient mHttpClient = new OkHttpClient();
-
-        RequestBody formBody = new FormBody.Builder()
-                .add("username", email)
-                .add("password", password)
-                .add("type", "0")
-                .build();
-
-        Request request = new Request.Builder()
-                .url(UrlUtil.loginUrl)
-                .post(formBody)
-                .build();
-
-        Call call = mHttpClient.newCall(request);
-        call.enqueue(new Callback() {
+        //此处替换为你的用户名密码
+        BmobUser.loginByAccount(email, password, new LogInListener<BmobUser>() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void done(BmobUser user, BmobException e) {
                 handler.sendEmptyMessage(0);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String str = response.body().string();
-                Logger.d("TAG", str);
-                JSONObject jsonObject = JSON.parseObject(str);
-                int status = jsonObject.getIntValue("status");
-                switch (status) {
-                    case 0:
-                        handler.sendEmptyMessage(1);
-                        UserBean userBean = new UserBean();
-                        userBean.setPhoneNumber(email);
-                        userBean.setPassword(password);
-                        userBean.save();
-                        break;
-                    case 1:handler.sendEmptyMessage(2);break;
+                if (e == null) {
+                    ToastUtil.normalShow(LoginActivity.this, "登录成功!", true);
+                    UserBean userBean = new UserBean();
+                    userBean.setPhoneNumber(email);
+                    userBean.setPassword(password);
+                    userBean.save();
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                } else {
+                    ToastUtil.normalShow(LoginActivity.this, "登录失败!" + e.getMessage(), true);
                 }
             }
-
         });
-
     }
 
     /**

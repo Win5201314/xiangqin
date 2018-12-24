@@ -16,12 +16,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,6 +37,7 @@ import com.zsl.Util.ToastUtil;
 import com.zsl.Util.UrlUtil;
 import com.zsl.Util.UtilTools;
 import com.zsl.adapter.UserImageAdapter;
+import com.zsl.bean.Detail;
 import com.zsl.bean.UserBean;
 import com.zsl.bean.UserImage;
 import com.zsl.xiangqin.LoginActivity;
@@ -45,6 +48,10 @@ import org.litepal.LitePal;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
 public class MainActivity extends AppCompatActivity implements UserImageAdapter.OnItemClickListener {
@@ -52,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements UserImageAdapter.
     private SwipeRefreshLayout mSwipeRefreshWidget;
     private RecyclerView recyclerView;
     private List<UserImage> userImages = new ArrayList<>();
+    private List<Detail> details = new ArrayList<>();
     private UserImageAdapter userImageAdapter;
     private static int lastVisibleItem = 0;
 
@@ -65,6 +73,10 @@ public class MainActivity extends AppCompatActivity implements UserImageAdapter.
                     userImageAdapter.notifyDataSetChanged();
                     break;
                 }
+                case 1: {
+                    mSwipeRefreshWidget.setRefreshing(false);
+                    break;
+                }
             }
         }
     };
@@ -75,16 +87,15 @@ public class MainActivity extends AppCompatActivity implements UserImageAdapter.
         setContentView(R.layout.activity_main);
         ActivityCollector.addActivity(this);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, AgreeActivity.class));
-            }
-        });
-
-        for (int i = 0; i < 15; i++) {
-            userImages.add(new UserImage("468", "湖北咸宁", "深圳福田岗厦", "92.2"));
+        if (UtilTools.isBoss()) {
+            FloatingActionButton fab = findViewById(R.id.fab);
+            fab.setVisibility(View.VISIBLE);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(new Intent(MainActivity.this, CheckActivity.class));
+                }
+            });
         }
 
         mSwipeRefreshWidget = findViewById(R.id.swipe_refresh_widget);
@@ -137,6 +148,8 @@ public class MainActivity extends AppCompatActivity implements UserImageAdapter.
         //创建数据库表
         LitePal.getDatabase();
 
+        Bmob.initialize(this, "6156cdcfe52926bc04a90d231ad6a1b1");
+
         //申请外部存储权限6.0
         AndPermission.with( this) .requestCode(100) .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE) .send();
         //申请拒绝后再次申请
@@ -147,23 +160,65 @@ public class MainActivity extends AppCompatActivity implements UserImageAdapter.
                 AndPermission.rationaleDialog(MainActivity.this, rationale).show();
             }
         }) .send();
+
+        onrefresh();
     }
-
-
 
     //刷新获取后台数据
     private void onrefresh() {
         mSwipeRefreshWidget.setRefreshing(true);
-        // 此处在现实项目中，请换成网络请求数据代码，sendRequest .....
         new Thread(new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < 8; i++) {
-                    userImages.add(new UserImage("468", "湖北咸宁", "深圳福田岗厦", "92.2"));
-                }
-                handler.sendEmptyMessageDelayed(0, 5000);
+                BmobQuery<Detail> query = new BmobQuery<>();
+                //查询playerName叫“比目”的数据
+                //query.addWhereEqualTo("type", type);
+                //返回50条数据，如果不加上这条语句，默认返回10条数据
+                query.setLimit(50);
+                //最新数据优先排出
+                query.order("-createdAt");
+                //执行查询方法
+                query.findObjects(new FindListener<Detail>() {
+                    @Override
+                    public void done(List<Detail> object, BmobException e) {
+                        if (e == null) {
+                            if (object.size() <= 0) {
+                                handler.sendEmptyMessage(1);
+                                return;
+                            }
+                            if (details.size() < 50) {
+                                List<Detail> details2 = new ArrayList<>();
+                                for (Detail detail : object) {
+                                    if (isNeedAdd(detail)) details2.add(detail);
+                                }
+                                details.addAll(details2);
+                                for (Detail detail : details2) {
+                                    userImages.add(new UserImage(detail.getImageUrl().split(";")[0], detail.getPath(), detail.getResidence(), detail.getBirthday()));
+                                }
+                            } else {
+                                details.addAll(object);
+                                for (Detail detail : object) {
+                                    userImages.add(new UserImage(detail.getImageUrl().split(";")[0], detail.getPath(), detail.getResidence(), detail.getBirthday()));
+                                }
+                            }
+                            handler.sendEmptyMessage(0);
+                        } else {
+                            handler.sendEmptyMessage(1);
+                        }
+                    }
+                });
             }
         }).start();
+    }
+
+    public boolean isNeedAdd(Detail d) {
+        String phoneNumber = d.getPhone();
+        boolean flag = false;
+        for (Detail detail : details) {
+            flag = phoneNumber.equals(detail.getPhone());
+            if (flag) return false;
+        }
+        return true;
     }
 
     @Override
@@ -176,24 +231,31 @@ public class MainActivity extends AppCompatActivity implements UserImageAdapter.
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+            case R.id.action_search: {
+                if (UtilTools.isLogined()) {
+                    showSearchDialog();
+                } else {
+                    //进入登录界面
+                    startActivity(new Intent(this, LoginActivity.class));
+                }
+                break;
+            }
             case R.id.action_likeMe: {
-                /*if (UtilTools.isLogined()) {
+                if (UtilTools.isLogined()) {
                     startActivity(new Intent(this, LikeActivity.class));
                 } else {
                     ToastUtil.show(this, R.string.needLogin, true);
                     startActivity(new Intent(this, LoginActivity.class));
-                }*/
-                startActivity(new Intent(this, LikeActivity.class));
+                }
                 break;
             }
             case R.id.action_likeOther: {
-                /*if (UtilTools.isLogined()) {
+                if (UtilTools.isLogined()) {
                     startActivity(new Intent(this, LikeOtherActivity.class));
                 } else {
                     ToastUtil.show(this, R.string.needLogin, true);
                     startActivity(new Intent(this, LoginActivity.class));
-                }*/
-                startActivity(new Intent(this, LikeOtherActivity.class));
+                }
                 break;
             }
             case R.id.action_joinGroup: {
@@ -202,6 +264,20 @@ public class MainActivity extends AppCompatActivity implements UserImageAdapter.
             }
             case R.id.action_send: {
                 startActivity(new Intent(this, AgreeActivity.class));
+                break;
+            }
+            case R.id.action_mesend: {
+                List<UserBean> userBeans = LitePal.findAll(UserBean.class);
+                if (userBeans != null && userBeans.size() == 1) {
+                    meSend(userBeans.get(0).getPhoneNumber());
+                } else {
+                    //进入登录界面
+                    startActivity(new Intent(this, LoginActivity.class));
+                }
+                break;
+            }
+            case R.id.action_news: {
+                startActivity(new Intent(this, NewsActivity.class));
                 break;
             }
             case R.id.action_share: {
@@ -218,13 +294,44 @@ public class MainActivity extends AppCompatActivity implements UserImageAdapter.
                 } else {
                     ToastUtil.normalShow(this, "当前没有登录账号!", true);
                     //进入登录界面
-                    startActivity(new Intent(this, RegisterActivity.class));
-                    finish();
+                    startActivity(new Intent(this, LoginActivity.class));
                 }
                 break;
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void meSend(final String phone) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BmobQuery<Detail> query = new BmobQuery<>();
+                //查询playerName叫“比目”的数据
+                query.addWhereEqualTo("phone", phone);
+                //返回1条数据，如果不加上这条语句，默认返回10条数据
+                query.setLimit(1);
+                //最新数据优先排出
+                query.order("-createdAt");
+                //执行查询方法
+                query.findObjects(new FindListener<Detail>() {
+                    @Override
+                    public void done(List<Detail> object, BmobException e) {
+                        if (e == null) {
+                            if (object.size() <= 0) {
+                                ToastUtil.normalShow(MainActivity.this, "不存在!", true);
+                                return;
+                            }
+                            Detail detail = object.get(0);
+                            if (detail == null) return;
+                            Intent intent = new Intent(MainActivity.this, MeSendActivity.class);
+                            intent.putExtra("detail", detail);
+                            startActivity(intent);
+                        }
+                    }
+                });
+            }
+        }).start();
     }
 
     private void showExitDialog() {
@@ -240,6 +347,29 @@ public class MainActivity extends AppCompatActivity implements UserImageAdapter.
                         //进入登录界面
                         startActivity(new Intent(context, LoginActivity.class));
                         finish();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .show();
+    }
+
+    public void showSearchDialog() {
+        final Context context = MainActivity.this;
+        View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_search, null);
+        final AppCompatEditText phone = view.findViewById(R.id.phone);
+        new AlertDialog.Builder(context)
+                .setTitle("查找[手机号查找]")
+                .setCancelable(true)
+                .setView(view)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        meSend(phone.getText().toString());
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -271,15 +401,17 @@ public class MainActivity extends AppCompatActivity implements UserImageAdapter.
     @Override
     public void onClick(int position) {
         //查找数据库
-        /*if (UtilTools.isLogined()) {
-            startActivity(new Intent(this, DetailActivity.class));
+        if (UtilTools.isLogined()) {
+            if (details.size() > position) {
+                Intent intent = new Intent(this, DetailActivity.class);
+                intent.putExtra("detail", details.get(position));
+                startActivity(intent);
+            }
         } else {
             ToastUtil.show(this, R.string.needLogin, true);
             //没登录，就去登录
             startActivity(new Intent(this, LoginActivity.class));
-            finish();
-        }*/
-        startActivity(new Intent(this, DetailActivity.class));
+        }
     }
 
     private void showShare() {

@@ -8,12 +8,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <android.support.v7.widget.AppCompatTextView
+            android:text="加此微信[13480901446],拉你进微信群[免费的]"
+            android:textColor="@color/colorAccent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <android.support.v7.widget.AppCompatTextView
+            android:visibility="gone"
             android:text="加入下面你想要进的群吧,里面你们可以自由组织活动,增进了解!"
             android:textColor="@color/colorAccent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/show"
+            android:visibility="gone"
             android:layout_marginTop="16dp"
             android:text="群名：2568692586"
             android:textColor="#000000"

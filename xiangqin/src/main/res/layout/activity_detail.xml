@@ -15,6 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <android.support.v7.widget.AppCompatTextView
+            android:visibility="gone"
             android:textColor="@color/colorAccent"
             android:text="如果你想跟(他或者她)聊,请将你的个人信息加图片,通过上面邮件地址发过去!"
             android:layout_width="match_parent"
@@ -40,6 +41,25 @@
             android:src="@mipmap/dsg"
             android:layout_width="wrap_content"
             android:layout_height="300dp" />
+
+        <Button
+            android:id="@+id/likeOther"
+            android:background="@color/colorAccent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="我喜欢你"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/delete"
+            android:visibility="gone"
+            android:background="@color/colorAccent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="删除这条数据"
+            android:textStyle="bold" />
         <View
             android:layout_width="match_parent"
             android:layout_height="180dp"/>

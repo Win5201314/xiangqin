@@ -27,12 +27,23 @@ android {
         }
     }
 
+    configurations {
+        all*.exclude group: 'com.squareup.okio'
+        all*.exclude group: 'com.android.support', module: 'support-v13'
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
 }
 
 android{
     aaptOptions.cruncherEnabled = false
 
     aaptOptions.useNewCruncher = false
+
+    useLibrary 'org.apache.http.legacy'
 }
 
 apply plugin: 'com.mob.sdk'
@@ -40,6 +51,8 @@ apply plugin: 'com.mob.sdk'
 MobSDK {
     appKey "285b0094f5f7c"
     appSecret "058b42782c605dd8bbbd49940f904412"
+    CMSSDK {}
+    UMSSDK {}
     ShareSDK {
         devInfo {
             /*SinaWeibo {
@@ -116,7 +129,12 @@ dependencies {
     compile 'com.tencent.bugly:nativecrashreport:3.3.1'
 
     compile 'com.aliyun.dpa:oss-android-sdk:2.4.5'
-    compile 'com.squareup.okhttp3:okhttp:3.7.0'
-    compile 'com.squareup.okio:okio:1.12.0'
+    compile 'com.squareup.okhttp3:okhttp:3.11.0'
+    compile 'com.squareup.okio:okio:2.1.0'
     compile 'com.yanzhenjie:permission:1.0.5'
+
+    compile 'cn.bmob.android:bmob-sdk:3.6.3'
+    compile 'cn.bmob.android:http-legacy:1.0'
+    compile 'com.codercf:androidpickerlibrary:1.0.2'
+    compile 'cn.qqtheme.framework:AndroidPicker:latest.integration'
 }

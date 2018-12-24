@@ -2,6 +2,7 @@ package com.zsl.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -13,17 +14,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatImageView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 
+import com.cf.androidpickerlibrary.AddressPicker;
+import com.cf.androidpickerlibrary.DatePicker;
 import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.squareup.picasso.Picasso;
 import com.yanzhenjie.album.Album;
 import com.zsl.Util.Logger;
 import com.zsl.Util.ToastUtil;
-import com.zsl.bean.Detail;
+import com.zsl.bean.BeforeDetail;
 import com.zsl.oss.OSSData;
 import com.zsl.oss.OssService;
 import com.zsl.xiangqin.LoginActivity;
@@ -31,6 +35,13 @@ import com.zsl.xiangqin.R;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+
+import cn.bmob.v3.datatype.BmobFile;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UploadBatchListener;
+import cn.qqtheme.framework.picker.OptionPicker;
 
 public class SubmitActivity extends BaseActivity implements View.OnClickListener {
 
@@ -72,6 +83,8 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
     private EditText phone;
     //邮箱地址
     private EditText email;
+    //额外补充
+    private EditText bc;
     //三张图片
     private AppCompatImageView image1, image2, image3;
     //投稿
@@ -79,7 +92,9 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
 
     private NumberProgressBar update_progress;
 
-    Detail detail = new Detail();
+    BeforeDetail detail = new BeforeDetail();
+
+    private ProgressDialog progressDialog;
 
     @SuppressLint("HandlerLeak")
     public Handler handler = new Handler(){
@@ -89,6 +104,15 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
                 case 0:{
                     ToastUtil.normalShow(SubmitActivity.this, "上传成功!审核通过之后我们会展示到主页!", true);
                     finish();
+                    break;
+                }
+                case 1: {
+                    //上传个人数据[图片上传完之后的]
+                    sendDetail();
+                    break;
+                }
+                case 2: {
+                    progressDialog.dismiss();
                     break;
                 }
             }
@@ -134,13 +158,13 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
     private void initView() {
         name = findViewById(R.id.name);
         sex = findViewById(R.id.sex);
-        jx = findViewById(R.id.jx);
-        birthday = findViewById(R.id.birthday);
-        xjd = findViewById(R.id.xjd);
+        jx = findViewById(R.id.jx);jx.setOnClickListener(this);
+        birthday = findViewById(R.id.birthday);birthday.setOnClickListener(this);
+        xjd = findViewById(R.id.xjd);xjd.setOnClickListener(this);
         sg = findViewById(R.id.sg);
         tz = findViewById(R.id.tz);
         xz = findViewById(R.id.xz);
-        xl = findViewById(R.id.xl);
+        xl = findViewById(R.id.xl);xl.setOnClickListener(this);
         job = findViewById(R.id.job);
         yx = findViewById(R.id.yx);
         carAndHome = findViewById(R.id.carAndHome);
@@ -160,11 +184,68 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
         send = findViewById(R.id.send);
         send.setOnClickListener(this);
         update_progress = findViewById(R.id.update_progress);
+        bc = findViewById(R.id.bc);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.jx: {
+                AddressPicker picker = new AddressPicker(SubmitActivity.this);
+
+                picker.setAddressListener(new AddressPicker.OnAddressListener() {
+                    @Override
+                    public void onAddressSelected(String province, String city, String area) {
+                        jx.setText(String.valueOf(province + "-" + city + "-" + area));
+                    }
+                });
+
+                picker.show();
+                break;
+            }
+            case R.id.xjd: {
+                AddressPicker picker = new AddressPicker(SubmitActivity.this);
+
+                picker.setAddressListener(new AddressPicker.OnAddressListener() {
+                    @Override
+                    public void onAddressSelected(String province, String city, String area) {
+                        xjd.setText(String.valueOf(province + "-" + city + "-" + area));
+                    }
+                });
+
+                picker.show();
+                break;
+            }
+            case R.id.birthday: {
+                DatePicker picker = new DatePicker(SubmitActivity.this);
+
+                picker.setDateListener(new DatePicker.OnDateCListener() {
+                    @Override
+                    public void onDateSelected(String year, String month, String day) {
+                        birthday.setText(String.valueOf(year + "-" + month + "-" + day));
+                    }
+                });
+
+                picker.show();
+                break;
+            }
+            case R.id.xl: {
+                OptionPicker picker = new OptionPicker(this, new String[]{
+                        "大学本科", "专科", "研究生", "硕士", "博士", "小学", "初中", "高中", "其它"
+                });
+                picker.setOffset(2);
+                picker.setSelectedIndex(0);
+                picker.setTextSize(11);
+                picker.setOnOptionPickListener(new OptionPicker.OnOptionPickListener() {
+                    @Override
+                    public void onOptionPicked(String option) {
+                        xl.setText(option);
+                    }
+                });
+
+                picker.show();
+                break;
+            }
             case R.id.send: {
                 sendGao();
                 break;
@@ -202,18 +283,19 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
         cy.setError(null);
         phone.setError(null);
         email.setError(null);
+        bc.setError(null);
         //
         boolean cancel = false;
         View focusView = null;
         //
-        String E = email.getText().toString();
+        /*String E = email.getText().toString();
         if (TextUtils.isEmpty(E)) {
             email.setError(getString(R.string.noNull));
             focusView = email;
             cancel = true;
         } else {
             detail.setEmail(E);
-        }
+        }*/
         String ph = phone.getText().toString();
         if (TextUtils.isEmpty(ph)) {
             phone.setError(getString(R.string.noNull));
@@ -234,22 +316,22 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
         } else {
             detail.setRequirement(YQ);
         }
-        String DS = ds.getText().toString();
+        /*String DS = ds.getText().toString();
         if (TextUtils.isEmpty(DS)) {
             ds.setError(getString(R.string.noNull));
             focusView = ds;
             cancel = true;
         } else {
             detail.setPlanning(DS);
-        }
-        String XG = xg.getText().toString();
+        }*/
+        /*String XG = xg.getText().toString();
         if (TextUtils.isEmpty(XG)) {
             xg.setError(getString(R.string.noNull));
             focusView = xg;
             cancel = true;
         } else {
             detail.setCharacter(XG);
-        }
+        }*/
         String car = carAndHome.getText().toString();
         if (TextUtils.isEmpty(car)) {
             carAndHome.setError(getString(R.string.noNull));
@@ -330,20 +412,22 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
         } else {
             detail.setName(n);
         }
+        String bcbc = bc.getText().toString();
+        if (TextUtils.isEmpty(bcbc)) detail.setBc("");
+        else detail.setBc(bcbc);
         //
-        String XZ = xz.getText().toString();
+        /*String XZ = xz.getText().toString();
         if (!TextUtils.isEmpty(XZ)) {
            detail.setConstellation(XZ);
         }
         String F = cy.getText().toString();
         if (!TextUtils.isEmpty(F)) {
             detail.setFamily(F);
-        }
+        }*/
         //
         if (mImageList != null && mImageList.size() == 3) {
-            detail.setImage1(mImageList.get(0));
-            detail.setImage2(mImageList.get(1));
-            detail.setImage3(mImageList.get(2));
+            String sr = mImageList.get(0) + ";" + mImageList.get(1) + ";" + mImageList.get(2);
+            detail.setImageUrl(sr);
         } else {
             ToastUtil.normalShow(SubmitActivity.this, "图片没有三张!", true);
             return;
@@ -358,7 +442,51 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
             // perform the user login attempt.
             ToastUtil.normalShow(SubmitActivity.this, "正在上传,莫慌!", true);
             //SEND("", "");
+            String[] filePaths = new String[3];
+            filePaths[0] = mImageList.get(0);
+            filePaths[1] = mImageList.get(1);
+            filePaths[2] = mImageList.get(2);
+            progressDialog = new ProgressDialog(SubmitActivity.this);
+            progressDialog.setTitle(getResources().getString(R.string.app_name));
+            progressDialog.setMessage("正在上传...");
+            progressDialog.setCancelable(true);
+            progressDialog.show();
+            sendBmo(filePaths);
         }
+    }
+
+    //上传投稿
+    private void sendBmo(final String[] filePaths) {
+        BmobFile.uploadBatch(filePaths, new UploadBatchListener() {
+
+            @Override
+            public void onSuccess(List<BmobFile> files, List<String> urls) {
+                //1、files-上传完成后的BmobFile集合，是为了方便大家对其上传后的数据进行操作，例如你可以将该文件保存到表中
+                //2、urls-上传文件的完整url地址
+                for (String s : urls) {
+                    Log.d("TAG", "==============" + s);
+                }
+                if(urls.size() == filePaths.length){//如果数量相等，则代表文件全部上传完成
+                    //do something
+                    String s = urls.get(0) + ";" + urls.get(1) + ";" + urls.get(2);
+                    detail.setImageUrl(s);
+                    handler.sendEmptyMessage(1);
+                }
+            }
+
+            @Override
+            public void onError(int statuscode, String errormsg) {
+                ToastUtil.normalShow(SubmitActivity.this, "错误码"+statuscode +",错误描述："+errormsg, true);
+            }
+
+            @Override
+            public void onProgress(int curIndex, int curPercent, int total,int totalPercent) {
+                //1、curIndex--表示当前第几个文件正在上传
+                //2、curPercent--表示当前上传文件的进度值（百分比）
+                //3、total--表示总的上传文件数
+                //4、totalPercent--表示总的上传进度（百分比）
+            }
+        });
     }
 
     //上传投稿
@@ -454,6 +582,20 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void sendDetail() {
+        detail.save(new SaveListener<String>() {
+            @Override
+            public void done(String objectId,BmobException e) {
+                handler.sendEmptyMessage(2);
+                if (e == null) {
+                    ToastUtil.normalShow(SubmitActivity.this, "上传成功!", true);
+                } else {
+                    ToastUtil.normalShow(SubmitActivity.this, "上传失败！重新来一次吧！" + e.getMessage(), true);
+                }
+            }
+        });
     }
 
 }
